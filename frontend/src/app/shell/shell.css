@@ -1,0 +1,81 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 50;
+  padding: 12px 18px;
+  border-radius: 0 0 10px 0;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+.ov-page {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--page-gradient);
+}
+
+.ov-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background:
+    radial-gradient(720px 520px at 84% 6%, rgba(96, 132, 220, 0.16), transparent 60%),
+    radial-gradient(640px 540px at 10% 94%, rgba(70, 96, 150, 0.13), transparent 62%);
+}
+
+.ov-texture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: screen;
+  background: repeating-linear-gradient(115deg, #ffffff 0 1px, transparent 1px 4px);
+}
+
+.ov-logo-tile {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #cdd8ef, #8194bc 55%, #46557d);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.7),
+    inset 0 -2px 4px rgba(10, 16, 30, 0.5),
+    0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.ov-wordmark {
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  background: linear-gradient(180deg, #f4f7fd, #aab8d7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ov-connected-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success);
+}

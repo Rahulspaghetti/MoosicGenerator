@@ -1,0 +1,1 @@
+"""SpaghettiTunes FastAPI backend package."""

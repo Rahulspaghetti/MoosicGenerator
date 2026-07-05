@@ -1,0 +1,313 @@
+@import "tailwindcss";
+
+/*
+ * Overtone design tokens — single source of truth for the theme.
+ * Static tokens live as plain CSS custom properties on :root.
+ * The accent pair (--accent / --accent-light) is written at runtime by
+ * ThemeService (frontend/src/app/core/theme/theme.ts) so every component
+ * that reads var(--accent) reacts to the active accent option automatically.
+ */
+:root {
+  --bg: #05070d;
+  --page-gradient: radial-gradient(1300px 820px at 50% -14%, #1b2a4c 0%, #0d1528 40%, #080d18 76%, #05070d 100%);
+
+  --text: #eaf0fb;
+  --text-2: #f2f6fd;
+  --text-3: #eef2fa;
+  --text-muted: #8d9bb8;
+  --text-dim-1: #7d8aa6;
+  --text-dim-2: #6b7893;
+  --text-dim-3: #5c6a86;
+  --text-dim-4: #4e5b76;
+  --label: #aebbd6;
+
+  /* Overridden at runtime by ThemeService; defaults match the "blue" option. */
+  --accent: #6a8fe0;
+  --accent-light: #a6bcec;
+
+  --success: #34e08a;
+  --success-2: #16b866;
+  --success-text: #6ee7a8;
+  --danger: #e8896f;
+
+  --on-accent: #0b1220;
+  --on-accent-2: #06251a;
+
+  --card-grad-1: rgba(31, 43, 71, 0.92);
+  --card-grad-2: rgba(14, 20, 36, 0.94);
+  --card-border: rgba(150, 170, 210, 0.16);
+
+  --field-bg: rgba(10, 15, 28, 0.75);
+  --field-border: rgba(150, 170, 210, 0.18);
+
+  --row-bg: rgba(18, 26, 46, 0.6);
+  --row-border: rgba(150, 170, 210, 0.1);
+
+  --font-display: 'Playfair Display', serif;
+  --font-ui: 'Manrope', system-ui, sans-serif;
+
+  --ease-standard: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Expose runtime tokens as Tailwind utilities (bg-accent, text-accent, font-display, ...) */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-label: var(--label);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-on-accent: var(--on-accent);
+
+  --font-display: var(--font-display);
+  --font-ui: var(--font-ui);
+
+  --radius-control: 12px;
+  --radius-card: 20px;
+  --radius-pill: 999px;
+
+  --ease-standard: var(--ease-standard);
+}
+
+@keyframes ov-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes ov-spin-rev {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+@keyframes ov-disc {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes ov-ripple {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+@keyframes ov-eq {
+  0%,
+  100% {
+    transform: scaleY(0.22);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@keyframes ov-glow {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+@keyframes ov-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes ov-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Respect the user's motion preference: freeze every looping ov- animation. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+}
+
+textarea,
+input,
+button,
+select {
+  font-family: inherit;
+}
+
+textarea::placeholder,
+input::placeholder {
+  color: #566076;
+}
+
+/* Consistent, visible, accent-colored focus ring across the whole app (WCAG AA). */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.font-variant-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Shared Overtone UI primitives — used across login/callback/studio so    */
+/* every surface pulls from the same tokens instead of per-component CSS. */
+/* ---------------------------------------------------------------------- */
+
+.ov-fade-up {
+  animation: ov-fade-up 0.6s var(--ease-standard) both;
+}
+
+.ov-hero-italic {
+  font-style: italic;
+  background: linear-gradient(180deg, #bccdf0, #8095c4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ov-card {
+  border-radius: 22px;
+  padding: 30px 28px;
+  background: linear-gradient(158deg, var(--card-grad-1), var(--card-grad-2));
+  border: 1px solid var(--card-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+.ov-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  transition:
+    filter 0.2s var(--ease-standard),
+    transform 0.2s var(--ease-standard),
+    opacity 0.2s var(--ease-standard);
+}
+
+.ov-btn:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.ov-btn:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.ov-btn:disabled {
+  cursor: not-allowed;
+}
+
+.ov-btn-neutral {
+  font-weight: 600;
+  color: #eef2fa;
+  background: linear-gradient(180deg, rgba(53, 66, 96, 0.95), rgba(26, 34, 56, 0.98));
+  border-color: rgba(160, 178, 216, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.ov-btn-spotify {
+  color: var(--on-accent-2);
+  background: linear-gradient(180deg, var(--success), var(--success-2));
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 8px 20px rgba(22, 184, 102, 0.28);
+}
+
+.ov-btn-accent {
+  color: var(--on-accent);
+  background: linear-gradient(180deg, var(--accent-light), var(--accent));
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 8px 22px rgba(0, 0, 0, 0.35);
+}
+
+.ov-spinner {
+  animation: ov-spin 0.9s linear infinite;
+}
+
+.ov-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 22px 2px;
+}
+
+.ov-divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(150, 170, 210, 0.14);
+}
+
+.ov-divider-label {
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-dim-3);
+}
+
+.ov-row {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  background: var(--row-bg);
+  border: 1px solid var(--row-border);
+}
+
+.ov-row-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 9px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25);
+}

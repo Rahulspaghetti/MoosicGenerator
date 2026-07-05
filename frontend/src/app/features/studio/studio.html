@@ -1,0 +1,60 @@
+<div class="ov-fade-up mx-auto max-w-[700px] px-6 pb-24 pt-6">
+  <h1 class="mb-2.5 font-[family-name:var(--font-display)] text-[32px] font-bold leading-[1.1] text-[var(--text-2)] sm:text-[40px]">
+    Welcome{{ authStore.displayName() ? ', ' + authStore.displayName() : '' }}
+  </h1>
+  <p class="m-0 text-[18px] leading-[1.5] text-[var(--text-muted)]">
+    Describe what you want to hear — {{ theme.brandName() }} blends your prompt with your listening taste.
+  </p>
+
+  <section class="mt-7" aria-label="Your taste profile">
+    <div class="mb-2.5 flex items-baseline justify-between">
+      <span class="text-[15px] font-bold tracking-[0.3px] text-[var(--label)]">Your taste so far</span>
+      <span class="text-[13.5px] text-[var(--text-dim-2)]">
+        {{ likedCount() }} liked songs@if (stillSyncing()) { · still loading… }
+      </span>
+    </div>
+    @if (genres().length) {
+      <ul class="flex list-none flex-wrap gap-2 p-0">
+        @for (g of genres().slice(0, 14); track g) {
+          <li class="ov-chip">{{ g }}</li>
+        }
+      </ul>
+    } @else {
+      <p class="m-0 text-[14.5px] text-[var(--text-dim-2)]">Reading your genres…</p>
+    }
+  </section>
+
+  <label for="prompt" class="mt-7 block text-[15px] font-bold tracking-[0.3px] text-[var(--label)]">
+    What should it sound like?
+  </label>
+  <textarea
+    id="prompt"
+    class="ov-textarea mt-2.5"
+    rows="4"
+    [value]="prompt()"
+    (input)="setPrompt($event)"
+    placeholder="A warm, late-night synthwave track for a long drive — mellow, around 100 BPM, with soft analog pads and a steady pulse."
+  ></textarea>
+
+  @if (genError()) {
+    <p role="alert" class="mt-3 text-[14.5px] text-[var(--danger)]">{{ genError() }}</p>
+  }
+
+  <button
+    type="button"
+    class="ov-btn ov-btn-accent mt-6"
+    [disabled]="!canGenerate()"
+    [attr.aria-busy]="generating() ? 'true' : null"
+    (click)="onGenerate()"
+  >
+    {{ generating() ? 'Queuing…' : 'Generate track' }}
+  </button>
+
+  @if (queuedJobId()) {
+    <p role="status" aria-live="polite" class="mt-4 text-[14.5px] text-[var(--text-muted)]">
+      Track queued (<span class="font-mono">{{ queuedJobId() }}</span>). The player arrives in the next phase.
+    </p>
+  }
+</div>
+
+<app-sync-dialog />

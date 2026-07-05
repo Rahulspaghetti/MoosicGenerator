@@ -1,0 +1,75 @@
+<div class="flex items-start justify-center px-6 pb-20 pt-9">
+  <div class="ov-fade-up w-full max-w-[460px]">
+    <div class="mb-8 text-center">
+      <h1 class="mb-3.5 font-[family-name:var(--font-display)] text-[36px] font-bold leading-[1.08] text-[var(--text-2)] sm:text-[44px]">
+        Music, tuned to <span class="ov-hero-italic">your</span> taste
+      </h1>
+      <p class="mx-auto max-w-[380px] text-[18px] leading-[1.55] text-[var(--text-muted)]">
+        Sign in, connect Spotify, and let {{ theme.brandName() }} compose original tracks shaped by what you
+        already love.
+      </p>
+    </div>
+
+    <div class="ov-card">
+      @if (authStore.error()) {
+        <p role="alert" class="mb-4 rounded-[12px] border px-4 py-3 text-[14.5px]" style="color: var(--danger); border-color: rgba(232,137,111,0.35); background: rgba(232,137,111,0.08);">
+          {{ authStore.error() }}
+        </p>
+      }
+
+      @if (!spotifyConnected()) {
+        <button
+          type="button"
+          class="ov-btn ov-btn-spotify"
+          [disabled]="connectingSpotify()"
+          [attr.aria-busy]="connectingSpotify() ? 'true' : null"
+          [attr.aria-label]="spotifyLabel()"
+          (click)="onSpotify()"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#06251a" aria-hidden="true">
+            <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.59 14.42a.62.62 0 0 1-.86.21c-2.35-1.44-5.3-1.76-8.79-.96a.62.62 0 1 1-.28-1.22c3.8-.87 7.08-.5 9.72 1.11.3.18.39.57.21.86Zm1.22-2.72a.78.78 0 0 1-1.07.26c-2.69-1.65-6.79-2.13-9.97-1.17a.78.78 0 1 1-.45-1.5c3.63-1.09 8.15-.56 11.24 1.34.37.22.48.7.25 1.07Zm.11-2.84C14.8 8.14 9.3 7.96 6.16 8.91a.94.94 0 1 1-.54-1.8c3.6-1.09 9.68-.88 13.35 1.3a.94.94 0 0 1-.96 1.61Z" />
+          </svg>
+          <span>{{ spotifyLabel() }}</span>
+        </button>
+        <p class="mt-4 px-0.5 text-center text-[14.5px] leading-[1.5] text-[var(--text-dim-2)]">
+          We read your Liked Songs and playlists. Your credentials never touch our servers.
+        </p>
+      } @else {
+        <div class="ov-fade-up">
+          <div class="mb-3.5 flex items-center justify-between">
+            <span class="text-[14px] font-semibold uppercase tracking-[1px] text-[#7482a0]">Your playlists</span>
+            <span class="text-[13.5px] text-[var(--text-dim-2)]">{{ playlistCount() }} imported</span>
+          </div>
+
+          <ul class="mb-[22px] flex list-none flex-col gap-2 p-0" aria-label="Imported playlists">
+            @for (pl of playlists(); track pl.id) {
+              <li class="ov-row">
+                <div class="ov-row-icon" [style.background]="pl.color">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M9 18V5l12-2v13" />
+                    <circle cx="6" cy="18" r="3" />
+                    <circle cx="18" cy="16" r="3" />
+                  </svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-semibold text-[#e7ecf7]">
+                    {{ pl.name }}
+                  </div>
+                  <div class="text-[13.5px] text-[#6f7c98]">{{ pl.tracks }} tracks</div>
+                </div>
+              </li>
+            }
+          </ul>
+
+          <button type="button" class="ov-btn ov-btn-accent" [disabled]="navigatingToStudio()" (click)="onEnterStudio()">
+            Enter the studio
+          </button>
+        </div>
+      }
+    </div>
+
+    <p class="mt-[22px] text-center text-[13.5px] text-[var(--text-dim-4)]">
+      By continuing you agree to {{ theme.brandName() }}'s terms and privacy policy.
+    </p>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+.ov-spinner-ring {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 3px solid rgba(238, 242, 250, 0.2);
+  border-top-color: var(--accent);
+  animation: ov-spin 0.9s linear infinite;
+}

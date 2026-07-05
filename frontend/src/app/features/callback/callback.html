@@ -1,0 +1,18 @@
+<div class="flex min-h-[70vh] items-center justify-center px-6">
+  <div class="ov-card w-full max-w-[420px] text-center">
+    @switch (status()) {
+      @case ('error') {
+        <p role="alert" class="mb-5 text-[17px] leading-[1.5] text-[var(--danger)]">
+          {{ errorMessage() }}
+        </p>
+        <button #retryBtn type="button" class="ov-btn ov-btn-accent" (click)="onRetry()">Back to sign in</button>
+      }
+      @default {
+        <div class="ov-spinner-ring" aria-hidden="true"></div>
+        <p role="status" aria-live="polite" class="mt-5 font-[family-name:var(--font-display)] text-[22px] italic text-[var(--text-2)]">
+          {{ status() === 'syncing' ? 'Taking you to the studio…' : 'Connecting your Spotify account…' }}
+        </p>
+      }
+    }
+  </div>
+</div>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600;1,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #05070d;
+    color: #eaf0fb;
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-size: 18px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  textarea, input, button { font-family: inherit; }
+  textarea::placeholder { color: #566076; }
+  @keyframes ov-spin { to { transform: rotate(360deg); } }
+  @keyframes ov-spin-rev { to { transform: rotate(-360deg); } }
+  @keyframes ov-disc { to { transform: rotate(360deg); } }
+  @keyframes ov-ripple { 0% { transform: scale(.4); opacity: .55; } 100% { transform: scale(2); opacity: 0; } }
+  @keyframes ov-eq { 0%,100% { transform: scaleY(.22); } 50% { transform: scaleY(1); } }
+  @keyframes ov-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @keyframes ov-fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes ov-glow { 0%,100% { opacity: .4; } 50% { opacity: .95; } }
+</style>
+</helmet>
+<div style="min-height: 100vh; width: 100%; position: relative; overflow: hidden; background:
+    radial-gradient(1300px 820px at 50% -14%, #1b2a4c 0%, #0d1528 40%, #080d18 76%, #05070d 100%);">
+
+  <div style="position: absolute; inset: 0; pointer-events: none; opacity: .55; background:
+      radial-gradient(720px 520px at 84% 6%, rgba(96,132,220,0.16), transparent 60%),
+      radial-gradient(640px 540px at 10% 94%, rgba(70,96,150,0.13), transparent 62%);"></div>
+  <div style="position: absolute; inset: 0; pointer-events: none; opacity: .04; mix-blend-mode: screen; background:
+      repeating-linear-gradient(115deg, #ffffff 0 1px, transparent 1px 4px);"></div>
+
+  <!-- Top bar -->
+  <div style="position: relative; z-index: 3; display: flex; align-items: center; justify-content: space-between; padding: 22px 40px; max-width: 1180px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; gap: 13px;">
+      <div style="width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center;
+          background: linear-gradient(160deg, #cdd8ef, #8194bc 55%, #46557d);
+          box-shadow: inset 0 1px 1px rgba(255,255,255,0.7), inset 0 -2px 4px rgba(10,16,30,0.5), 0 4px 14px rgba(0,0,0,0.4);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      </div>
+      <span style="font-family: 'Playfair Display', serif; font-size: 25px; font-weight: 700; letter-spacing: .4px;
+          background: linear-gradient(180deg, #f4f7fd, #aab8d7); -webkit-background-clip: text; background-clip: text; color: transparent;">{{ brand }}</span>
+    </div>
+    <sc-if value="{{ isStudio }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; align-items: center; gap: 9px; font-size: 14.5px; color: #96a3bf; padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(150,170,210,0.16); background: rgba(20,28,48,0.5);">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: #34e08a; box-shadow: 0 0 8px #34e08a;"></span>
+        Spotify connected
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- ============ LOGIN ============ -->
+  <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+  <div style="position: relative; z-index: 2; display: flex; align-items: flex-start; justify-content: center; padding: 38px 24px 80px;">
+    <div style="width: 100%; max-width: 460px; animation: ov-fade-up .6s cubic-bezier(0.32,0.72,0,1) both;">
+
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="font-family: 'Playfair Display', serif; font-weight: 700; font-size: 44px; line-height: 1.08; margin: 0 0 14px; color: #f2f6fd;">
+          Music, tuned to <span style="font-style: italic; background: linear-gradient(180deg,#bccdf0,#8095c4); -webkit-background-clip: text; background-clip: text; color: transparent;">your</span> taste
+        </h1>
+        <p style="margin: 0 auto; max-width: 380px; font-size: 18px; line-height: 1.55; color: #8d9bb8;">
+          Sign in, connect Spotify, and let {{ brand }} compose original tracks shaped by what you already love.
+        </p>
+      </div>
+
+      <div style="border-radius: 22px; padding: 30px 28px;
+          background: linear-gradient(158deg, rgba(31,43,71,0.92), rgba(14,20,36,0.94));
+          border: 1px solid rgba(150,170,210,0.16);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 24px 60px rgba(0,0,0,0.5);">
+
+        <button onClick="{{ onGoogle }}" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px; border-radius: 12px; cursor: pointer; font-size: 17px; font-weight: 600; color: #eef2fa;
+            background: linear-gradient(180deg, rgba(53,66,96,0.95), rgba(26,34,56,0.98));
+            border: 1px solid rgba(160,178,216,0.22);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 6px 16px rgba(0,0,0,0.35);" style-hover="filter: brightness(1.08);" style-active="transform: scale(0.985);">
+          <sc-if value="{{ googleDone }}" hint-placeholder-val="{{ false }}">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#34e08a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </sc-if>
+          <sc-if value="{{ googlePending }}" hint-placeholder-val="{{ true }}">
+            <svg width="21" height="21" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1Z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z"/></svg>
+          </sc-if>
+          {{ googleLabel }}
+        </button>
+
+        <div style="display: flex; align-items: center; gap: 14px; margin: 22px 2px;">
+          <div style="flex: 1; height: 1px; background: rgba(150,170,210,0.14);"></div>
+          <span style="font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: #5c6a86;">then</span>
+          <div style="flex: 1; height: 1px; background: rgba(150,170,210,0.14);"></div>
+        </div>
+
+        <sc-if value="{{ notConnected }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ onSpotify }}" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px; border-radius: 12px; cursor: pointer; font-size: 17px; font-weight: 700; color: #06251a;
+              background: linear-gradient(180deg, #34e08a, #16b866);
+              border: 1px solid rgba(255,255,255,0.28);
+              box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 8px 20px rgba(22,184,102,0.28);
+              opacity: {{ spotifyOpacity }};" style-hover="filter: brightness(1.06);" style-active="transform: scale(0.985);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#06251a"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.59 14.42a.62.62 0 0 1-.86.21c-2.35-1.44-5.3-1.76-8.79-.96a.62.62 0 1 1-.28-1.22c3.8-.87 7.08-.5 9.72 1.11.3.18.39.57.21.86Zm1.22-2.72a.78.78 0 0 1-1.07.26c-2.69-1.65-6.79-2.13-9.97-1.17a.78.78 0 1 1-.45-1.5c3.63-1.09 8.15-.56 11.24 1.34.37.22.48.7.25 1.07Zm.11-2.84C14.8 8.14 9.3 7.96 6.16 8.91a.94.94 0 1 1-.54-1.8c3.6-1.09 9.68-.88 13.35 1.3a.94.94 0 0 1-.96 1.61Z"/></svg>
+            Connect Spotify
+          </button>
+          <p style="margin: 16px 2px 0; font-size: 14.5px; line-height: 1.5; color: #6b7893; text-align: center;">
+            We read your Liked Songs and playlists. Your credentials never touch our servers.
+          </p>
+        </sc-if>
+
+        <sc-if value="{{ connected }}" hint-placeholder-val="{{ false }}">
+          <div style="animation: ov-fade-up .5s cubic-bezier(0.32,0.72,0,1) both;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+              <span style="font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: #7482a0; font-weight: 600;">Your playlists</span>
+              <span style="font-size: 13.5px; color: #6b7893;">{{ playlistCount }} imported</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px;">
+              <sc-for list="{{ spotifyPlaylists }}" as="pl" hint-placeholder-count="4">
+                <div style="display: flex; align-items: center; gap: 13px; padding: 11px 12px; border-radius: 12px; background: rgba(18,26,46,0.6); border: 1px solid rgba(150,170,210,0.1);">
+                  <div style="width: 42px; height: 42px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: {{ pl.color }}; box-shadow: inset 0 1px 1px rgba(255,255,255,0.25);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 16px; font-weight: 600; color: #e7ecf7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ pl.name }}</div>
+                    <div style="font-size: 13.5px; color: #6f7c98;">{{ pl.tracks }} tracks</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <button onClick="{{ onEnterStudio }}" style="width: 100%; padding: 16px; border-radius: 12px; cursor: pointer; font-size: 17px; font-weight: 700; color: #0b1220;
+                background: linear-gradient(180deg, {{ accentLight }}, {{ accent }});
+                border: 1px solid rgba(255,255,255,0.35);
+                box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 8px 22px rgba(0,0,0,0.35);" style-hover="filter: brightness(1.05);" style-active="transform: scale(0.985);">
+              Enter the studio
+            </button>
+          </div>
+        </sc-if>
+      </div>
+
+      <p style="text-align: center; font-size: 13.5px; color: #4e5b76; margin: 22px 0 0;">
+        By continuing you agree to {{ brand }}'s terms and privacy policy.
+      </p>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ STUDIO ============ -->
+  <sc-if value="{{ isStudio }}" hint-placeholder-val="{{ false }}">
+  <div style="position: relative; z-index: 2; max-width: 700px; margin: 0 auto; padding: 22px 24px 90px;">
+
+    <!-- IDLE FORM -->
+    <sc-if value="{{ isIdle }}" hint-placeholder-val="{{ true }}">
+    <div style="animation: ov-fade-up .5s cubic-bezier(0.32,0.72,0,1) both;">
+      <div style="margin-bottom: 28px;">
+        <h1 style="font-family: 'Playfair Display', serif; font-weight: 700; font-size: 40px; line-height: 1.1; margin: 0 0 10px; color: #f2f6fd;">Compose a new track</h1>
+        <p style="margin: 0; font-size: 18px; color: #8d9bb8; line-height: 1.5;">Describe what you want to hear. {{ brand }} blends your prompt with your listening taste.</p>
+      </div>
+
+      <!-- Prompt -->
+      <label style="display: block; font-size: 15px; font-weight: 700; letter-spacing: .3px; color: #aebbd6; margin-bottom: 10px;">What should it sound like?</label>
+      <textarea onInput="{{ setPrompt }}" value="{{ promptValue }}" placeholder="A warm, late-night synthwave track for a long drive — mellow, around 100 BPM, with soft analog pads and a steady pulse." style="width: 100%; min-height: 108px; resize: vertical; padding: 16px; font-size: 17px; line-height: 1.5; color: #eaf0fb; border-radius: 14px; outline: none;
+          background: rgba(10,15,28,0.75); border: 1px solid rgba(150,170,210,0.18); box-shadow: inset 0 1px 3px rgba(0,0,0,0.35);" style-focus="border-color: {{ accent }};"></textarea>
+
+      <!-- Samples -->
+      <label style="display: block; font-size: 15px; font-weight: 700; letter-spacing: .3px; color: #aebbd6; margin: 24px 0 10px;">Reference samples <span style="font-weight: 500; color: #6b7893;">— optional</span></label>
+      <label style="display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 14px; cursor: pointer;
+          background: rgba(10,15,28,0.55); border: 1.5px dashed rgba(150,170,210,0.28);" style-hover="border-color: {{ accent }};">
+        <div style="width: 44px; height: 44px; border-radius: 11px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(150,170,210,0.1); border: 1px solid rgba(150,170,210,0.16);">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#aebbd6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M20 16.5V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2.5"/></svg>
+        </div>
+        <div style="flex: 1;">
+          <div style="font-size: 16px; font-weight: 600; color: #dbe3f2;">Drop audio files or browse</div>
+          <div style="font-size: 13.5px; color: #6b7893; margin-top: 2px;">MP3, WAV or FLAC · up to 5 clips</div>
+        </div>
+        <input type="file" accept="audio/*" multiple onChange="{{ onFiles }}" style="display: none;" />
+      </label>
+
+      <sc-if value="{{ hasSamples }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+          <sc-for list="{{ samples }}" as="s" hint-placeholder-count="2">
+            <div style="display: flex; align-items: center; gap: 9px; padding: 8px 10px 8px 12px; border-radius: 999px; background: rgba(20,28,48,0.8); border: 1px solid rgba(150,170,210,0.16); font-size: 14.5px; color: #cdd7ea;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="{{ accent }}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              <span style="max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ s.name }}</span>
+              <button onClick="{{ s.remove }}" style="display: flex; background: none; border: none; cursor: pointer; padding: 2px; color: #7d8aa6;" style-hover="color: #e7ecf7;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- Lyrics toggle -->
+      <div style="margin-top: 26px; border-radius: 16px; overflow: hidden; background: linear-gradient(158deg, rgba(28,39,66,0.7), rgba(13,19,34,0.7)); border: 1px solid rgba(150,170,210,0.14);">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px;">
+          <div style="flex: 1;">
+            <div style="font-size: 17px; font-weight: 700; color: #eaf0fb;">Add lyrics</div>
+            <div style="font-size: 14.5px; color: #7d8aa6; margin-top: 3px;">Give the track a sung vocal line.</div>
+          </div>
+          <button onClick="{{ toggleLyrics }}" style="position: relative; width: 54px; height: 30px; border-radius: 999px; border: none; cursor: pointer; flex-shrink: 0; padding: 0; transition: background .25s cubic-bezier(0.32,0.72,0,1);
+              background: {{ lyricsTrack }}; box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);">
+            <span style="position: absolute; top: 3px; left: {{ lyricsKnobX }}; width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(180deg,#ffffff,#d5ddec); box-shadow: 0 2px 5px rgba(0,0,0,0.4); transition: left .25s cubic-bezier(0.32,0.72,0,1);"></span>
+          </button>
+        </div>
+
+        <sc-if value="{{ lyricsOn }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 0 20px 20px; animation: ov-fade-up .35s cubic-bezier(0.32,0.72,0,1) both;">
+            <textarea onInput="{{ setLyrics }}" value="{{ lyricsValue }}" placeholder="Write your lyrics here…" style="width: 100%; min-height: 130px; resize: vertical; padding: 15px; font-size: 16.5px; line-height: 1.6; color: #eaf0fb; border-radius: 12px; outline: none;
+                background: rgba(6,10,20,0.8); border: 1px solid {{ lyricsBorder }}; box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);" style-focus="border-color: {{ accent }};"></textarea>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px; min-height: 20px;">
+              <span style="font-size: 13.5px; color: {{ lyricsHintColor }};">{{ lyricsHint }}</span>
+              <span style="font-size: 13px; color: #5c6a86; font-variant-numeric: tabular-nums;">{{ lyricsCount }} chars</span>
+            </div>
+
+            <!-- AI enhance sub-toggle -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 14px; padding: 15px 16px; border-radius: 12px; background: rgba(10,15,28,0.6); border: 1px solid rgba(150,170,210,0.12);">
+              <div style="flex: 1;">
+                <div style="font-size: 16px; font-weight: 600; color: #e0e7f4;">Let AI enhance the lyrics</div>
+                <div style="font-size: 14px; color: #7d8aa6; margin-top: 3px;">Add creative lines and phrasing to fit the song. Off keeps your words exactly as written.</div>
+              </div>
+              <button onClick="{{ toggleEnhance }}" style="position: relative; width: 48px; height: 27px; border-radius: 999px; border: none; cursor: pointer; flex-shrink: 0; padding: 0; transition: background .25s cubic-bezier(0.32,0.72,0,1);
+                  background: {{ enhanceTrack }}; box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);">
+                <span style="position: absolute; top: 3px; left: {{ enhanceKnobX }}; width: 21px; height: 21px; border-radius: 50%; background: linear-gradient(180deg,#ffffff,#d5ddec); box-shadow: 0 2px 4px rgba(0,0,0,0.4); transition: left .25s cubic-bezier(0.32,0.72,0,1);"></span>
+              </button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- Generate -->
+      <button onClick="{{ onGenerate }}" style="width: 100%; margin-top: 26px; padding: 18px; border-radius: 14px; font-size: 18px; font-weight: 700; letter-spacing: .3px; color: #0b1220;
+          cursor: {{ genCursor }}; opacity: {{ genOpacity }};
+          background: linear-gradient(180deg, {{ accentLight }}, {{ accent }});
+          border: 1px solid rgba(255,255,255,0.32);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 10px 26px rgba(0,0,0,0.4);" style-hover="filter: brightness(1.05);" style-active="transform: scale(0.99);">
+        Generate track
+      </button>
+    </div>
+    </sc-if>
+
+    <!-- GENERATING -->
+    <sc-if value="{{ isRunning }}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-direction: column; align-items: center; padding: 20px 0 0; animation: ov-fade-up .5s cubic-bezier(0.32,0.72,0,1) both;">
+
+      <div style="position: relative; width: 340px; height: 340px; display: flex; align-items: center; justify-content: center;">
+        <!-- ripples -->
+        <div style="position: absolute; width: 150px; height: 150px; border-radius: 50%; border: 1.5px solid {{ accent }}; animation: ov-ripple 2.6s ease-out infinite;"></div>
+        <div style="position: absolute; width: 150px; height: 150px; border-radius: 50%; border: 1.5px solid {{ accent }}; animation: ov-ripple 2.6s ease-out infinite; animation-delay: .87s;"></div>
+        <div style="position: absolute; width: 150px; height: 150px; border-radius: 50%; border: 1.5px solid {{ accent }}; animation: ov-ripple 2.6s ease-out infinite; animation-delay: 1.74s;"></div>
+
+        <!-- orbit ring -->
+        <div style="position: absolute; width: 300px; height: 300px; animation: ov-spin 24s linear infinite;">
+          <sc-for list="{{ orbit }}" as="o" hint-placeholder-count="6">
+            <div style="position: absolute; top: 50%; left: 50%; width: 0; height: 0; transform: rotate({{ o.deg }}) translateY(-150px);">
+              <div style="width: 52px; height: 52px; margin: -26px; border-radius: 15px; display: flex; align-items: center; justify-content: center; animation: ov-spin-rev 24s linear infinite;
+                  background: linear-gradient(160deg, rgba(52,66,96,0.95), rgba(20,28,48,0.95)); border: 1px solid rgba(160,178,216,0.2);
+                  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 6px 16px rgba(0,0,0,0.4);">
+                <div style="color: #c6d2ea; display: flex;" data-icon="{{ o.icon }}"></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- center vinyl -->
+        <div style="position: absolute; width: 130px; height: 130px; border-radius: 50%; filter: blur(2px); background: radial-gradient(circle, {{ accent }} 0%, transparent 68%); animation: ov-glow 2.4s ease-in-out infinite;"></div>
+        <div style="position: relative; width: 116px; height: 116px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at 38% 32%, #2c3a5c, #0c1424 72%, #060a14 100%);
+            border: 1px solid rgba(160,178,216,0.22); box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08); animation: ov-disc 3.4s linear infinite;">
+          <div style="position: absolute; inset: 14px; border-radius: 50%; border: 1px solid rgba(160,178,216,0.12);"></div>
+          <div style="position: absolute; inset: 28px; border-radius: 50%; border: 1px solid rgba(160,178,216,0.1);"></div>
+          <div style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(160deg, {{ accentLight }}, {{ accent }}); box-shadow: inset 0 1px 1px rgba(255,255,255,0.5);"></div>
+        </div>
+      </div>
+
+      <!-- equalizer -->
+      <div style="display: flex; align-items: flex-end; gap: 6px; height: 46px; margin: 30px 0 4px;">
+        <sc-for list="{{ eqBars }}" as="b" hint-placeholder-count="9">
+          <div style="width: 6px; height: 46px; border-radius: 3px; transform-origin: bottom; background: linear-gradient(180deg, {{ accentLight }}, {{ accent }}); animation: ov-eq {{ b.dur }} ease-in-out infinite; animation-delay: {{ b.delay }};"></div>
+        </sc-for>
+      </div>
+
+      <h2 style="font-family: 'Playfair Display', serif; font-weight: 600; font-style: italic; font-size: 27px; color: #eef2fa; margin: 20px 0 6px; text-align: center; min-height: 36px;">{{ statusText }}</h2>
+      <p style="font-size: 15.5px; color: #7d8aa6; margin: 0 0 22px;">This usually takes under a minute.</p>
+
+      <!-- progress -->
+      <div style="width: 280px; height: 6px; border-radius: 3px; overflow: hidden; background: rgba(150,170,210,0.14);">
+        <div style="height: 100%; border-radius: 3px; width: {{ progressPct }}; background: linear-gradient(90deg, {{ accent }}, {{ accentLight }}); transition: width .5s cubic-bezier(0.32,0.72,0,1);"></div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- DONE -->
+    <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+    <div style="animation: ov-fade-up .5s cubic-bezier(0.32,0.72,0,1) both;">
+      <div style="display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; background: rgba(52,224,138,0.12); border: 1px solid rgba(52,224,138,0.3); font-size: 14px; font-weight: 600; color: #6ee7a8; margin-bottom: 18px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        Track ready
+      </div>
+      <h1 style="font-family: 'Playfair Display', serif; font-weight: 700; font-size: 36px; line-height: 1.12; margin: 0 0 24px; color: #f2f6fd;">Your track is composed</h1>
+
+      <div style="border-radius: 18px; padding: 22px; background: linear-gradient(158deg, rgba(31,43,71,0.92), rgba(14,20,36,0.94)); border: 1px solid rgba(150,170,210,0.16); box-shadow: 0 20px 50px rgba(0,0,0,0.45);">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <button onClick="{{ togglePlay }}" style="width: 62px; height: 62px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.3);
+              background: linear-gradient(180deg, {{ accentLight }}, {{ accent }}); box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 8px 20px rgba(0,0,0,0.35);" style-active="transform: scale(0.96);">
+            <div data-icon="{{ playIcon }}" style="color: #0b1220; display: flex;"></div>
+          </button>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: #f2f6fd;">{{ trackTitle }}</div>
+            <div style="font-size: 14px; color: #7d8aa6; margin-top: 2px;">{{ trackMeta }}</div>
+          </div>
+          <span style="font-family: 'Manrope'; font-variant-numeric: tabular-nums; font-size: 15px; color: #8593ae;">0:24</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 3px; height: 44px; margin-top: 18px;">
+          <sc-for list="{{ waveform }}" as="w" hint-placeholder-count="48">
+            <div style="flex: 1; border-radius: 2px; height: {{ w.h }}; background: {{ w.color }};"></div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 20px;">
+        <button onClick="{{ onReset }}" style="flex: 1; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; color: #0b1220;
+            background: linear-gradient(180deg, {{ accentLight }}, {{ accent }}); border: 1px solid rgba(255,255,255,0.32); box-shadow: inset 0 1px 0 rgba(255,255,255,0.45);" style-hover="filter: brightness(1.05);" style-active="transform: scale(0.99);">
+          Compose another
+        </button>
+        <button style="padding: 15px 22px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; color: #dbe3f2; display: flex; align-items: center; gap: 9px;
+            background: rgba(20,28,48,0.7); border: 1px solid rgba(150,170,210,0.2);" style-hover="filter: brightness(1.1);" style-active="transform: scale(0.99);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          Download
+        </button>
+      </div>
+    </div>
+    </sc-if>
+
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<!--
+  NOTE: This is a Claude Design "DC" component (React preview format), NOT the deliverable.
+  It is the visual source of truth. Agent A reimplements it as production Angular per design/THEME.md.
+  Props: brandName (default "SpaghettiTunes"), accentColor (#6a8fe0 | #34d0c0 | #c07cf0 | #d8a24a),
+  defaultLyricsOn (bool), autoEnhanceDefault (bool).
+  State machine: phase = login | studio ; gen = idle | running | done.
+  The original DC <script> logic + support.js runtime live in the claude.ai design project.
+-->
+</body>
+</html>

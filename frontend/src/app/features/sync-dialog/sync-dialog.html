@@ -1,0 +1,54 @@
+@if (sync.showDialog()) {
+  <aside class="ov-sync-dialog" role="status" aria-live="polite" aria-label="Library sync status">
+    <div class="flex items-start gap-3">
+      <div class="mt-0.5 shrink-0">
+        @if (sync.active()) {
+          <svg class="ov-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" stroke="rgba(238,242,250,0.2)" stroke-width="3" />
+            <path d="M21 12a9 9 0 0 0-9-9" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" />
+          </svg>
+        } @else if (sync.status() === 'complete') {
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34e08a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+        } @else {
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+          </svg>
+        }
+      </div>
+
+      <div class="min-w-0 flex-1">
+        <p class="m-0 text-[15px] font-semibold text-[var(--text-2)]">
+          @if (sync.active()) {
+            Building your taste profile
+          } @else if (sync.status() === 'complete') {
+            Taste profile ready
+          } @else {
+            Taste profile partly loaded
+          }
+        </p>
+        <p class="m-0 mt-0.5 text-[13.5px] leading-[1.45] text-[var(--text-dim-2)]">
+          @if (sync.active()) {
+            {{ sync.progress() }}% · {{ sync.processed() }}/{{ sync.total() }} artists · you can start composing now
+          } @else if (sync.status() === 'complete') {
+            {{ sync.likedCount() }} liked songs · {{ sync.genres().length }} genres
+          } @else {
+            {{ sync.error() }}
+          }
+        </p>
+        @if (sync.active() && sync.total() > 0) {
+          <div class="ov-sync-progress-track">
+            <div class="ov-sync-progress-fill" [style.width.%]="sync.progress()"></div>
+          </div>
+        }
+      </div>
+
+      <button type="button" class="ov-sync-dismiss" (click)="sync.dismiss()" aria-label="Dismiss sync status">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </aside>
+}

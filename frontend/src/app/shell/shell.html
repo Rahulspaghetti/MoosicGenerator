@@ -1,0 +1,33 @@
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<div class="ov-page">
+  <div class="ov-glow" aria-hidden="true"></div>
+  <div class="ov-texture" aria-hidden="true"></div>
+
+  <header class="relative z-[3] mx-auto flex max-w-[1180px] items-center justify-between px-6 py-[22px] sm:px-10">
+    <div class="flex items-center gap-[13px]">
+      <div class="ov-logo-tile" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l12-2v13" />
+          <circle cx="6" cy="18" r="3" />
+          <circle cx="18" cy="16" r="3" />
+        </svg>
+      </div>
+      <span class="ov-wordmark">{{ theme.brandName() }}</span>
+    </div>
+
+    @if (isStudio()) {
+      <div
+        class="flex items-center gap-[9px] rounded-[999px] border px-[14px] py-2 text-[14.5px]"
+        style="color: #96a3bf; border-color: rgba(150,170,210,0.16); background: rgba(20,28,48,0.5);"
+      >
+        <span class="ov-connected-dot" aria-hidden="true"></span>
+        Spotify connected
+      </div>
+    }
+  </header>
+
+  <main id="main-content" class="relative z-[2]">
+    <router-outlet />
+  </main>
+</div>

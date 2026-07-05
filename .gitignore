@@ -1,0 +1,49 @@
+# --- Secrets ---
+.env
+*.env
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+pip-wheel-metadata/
+
+# --- Generated media / model artifacts (Phase 3+) ---
+backend/media/
+backend/models_cache/
+*.mp3
+*.wav
+
+# --- Node / Angular (frontend, owned by Agent A) ---
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+node_modules/
+
+# --- Claude / agent tooling (never publish) ---
+.claude/
+CLAUDE.md
+**/CLAUDE.md
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Docker ---
+*.pid
