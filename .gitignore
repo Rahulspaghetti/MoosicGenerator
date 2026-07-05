@@ -36,8 +36,11 @@ node_modules/
 
 # --- Claude / agent tooling (never publish) ---
 .claude/
+.claude.json
 CLAUDE.md
+CLAUDE.local.md
 **/CLAUDE.md
+**/.claude/
 
 # --- IDE / OS ---
 .vscode/
