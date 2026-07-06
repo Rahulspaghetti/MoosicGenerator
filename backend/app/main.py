@@ -40,6 +40,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     cfg = Config(str(backend_dir / "alembic.ini"))
     cfg.set_main_option("script_location", str(backend_dir / "alembic"))
     command.upgrade(cfg, "head")
+
+    # Ensure the generated-media directory exists so /generate can write MP3s.
+    Path(get_settings().MEDIA_ROOT, "generations").mkdir(parents=True, exist_ok=True)
     yield
 
 

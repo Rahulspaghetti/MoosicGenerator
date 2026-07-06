@@ -7,9 +7,17 @@ that imports :mod:`app.models` (rather than each model module directly).
 """
 
 from app.models.artist_genre_cache import ArtistGenreCache
+from app.models.generation_job import GenerationJob
 from app.models.library_sync_job import LibrarySyncJob
 from app.models.oauth_state import OAuthState
 from app.models.taste_profile import TasteProfile
 from app.models.user_session import UserSession
 
-__all__ = ["ArtistGenreCache", "LibrarySyncJob", "OAuthState", "TasteProfile", "UserSession"]
+__all__ = [
+    "ArtistGenreCache",
+    "GenerationJob",
+    "LibrarySyncJob",
+    "OAuthState",
+    "TasteProfile",
+    "UserSession",
+]

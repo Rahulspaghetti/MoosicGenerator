@@ -36,8 +36,8 @@
     placeholder="A warm, late-night synthwave track for a long drive — mellow, around 100 BPM, with soft analog pads and a steady pulse."
   ></textarea>
 
-  @if (genError()) {
-    <p role="alert" class="mt-3 text-[14.5px] text-[var(--danger)]">{{ genError() }}</p>
+  @if (errorMessage()) {
+    <p role="alert" class="mt-3 text-[14.5px] text-[var(--danger)]">{{ errorMessage() }}</p>
   }
 
   <button
@@ -47,13 +47,20 @@
     [attr.aria-busy]="generating() ? 'true' : null"
     (click)="onGenerate()"
   >
-    {{ generating() ? 'Queuing…' : 'Generate track' }}
+    {{ generating() ? 'Generating…' : 'Generate track' }}
   </button>
 
-  @if (queuedJobId()) {
+  @if (generating()) {
     <p role="status" aria-live="polite" class="mt-4 text-[14.5px] text-[var(--text-muted)]">
-      Track queued (<span class="font-mono">{{ queuedJobId() }}</span>). The player arrives in the next phase.
+      {{ genStep() ?? 'Queuing…' }} ({{ genProgress() }}%)
     </p>
+  }
+
+  @if (audioUrl(); as url) {
+    <section class="mt-6" aria-label="Your generated track">
+      <p class="mb-2 text-[15px] font-bold tracking-[0.3px] text-[var(--label)]">Your track</p>
+      <audio controls preload="none" class="w-full" [src]="url"></audio>
+    </section>
   }
 </div>
 

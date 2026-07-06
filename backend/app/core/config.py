@@ -66,6 +66,14 @@ class Settings(BaseSettings):
     # than this many days; older (or a forced request) triggers a background refresh.
     PROFILE_TTL_DAYS: int = 14
 
+    # --- Music generation (Phase 3) ---
+    # HuggingFace transformers MusicGen checkpoint. CUDA-only at runtime.
+    MUSICGEN_MODEL: str = "facebook/musicgen-small"
+    # Target clip length per generation, in seconds (max_new_tokens = s * 50).
+    GENERATION_DURATION_S: int = 30
+    # Root dir for generated media; rendered MP3s go under MEDIA_ROOT/generations.
+    MEDIA_ROOT: str = str(Path(__file__).resolve().parents[2] / "media")
+
 
 @lru_cache
 def get_settings() -> Settings:

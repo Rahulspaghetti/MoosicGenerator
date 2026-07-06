@@ -20,8 +20,9 @@ Full product spec lives in [`Artifact.md`](./Artifact.md).
 | Library sync + taste profiling | ✅ Done (background job, rate-limit resilient) |
 | Durable taste profile (cached) | ✅ Done |
 | Angular frontend (login → sync → studio) | ✅ Done |
-| **Music generation (MusicGen)** | ⛔ **Stub only** — deterministic fake job, no real inference yet |
-| Celery worker / Redis | ⚙️ Wired for Docker, unused at runtime (sync runs in-process) |
+| OAuth tokens encrypted at rest | ✅ Done (Fernet) |
+| **Music generation (MusicGen)** | ✅ Real inference — `transformers` MusicGen on CUDA, MP3 delivered to an in-app player |
+| Celery worker / Redis | ⚙️ Wired for Docker, unused at runtime (sync + generation run in-process) |
 
 **Tests:** 32 backend (`pytest`) + 53 frontend (`vitest`) passing.
 
@@ -96,8 +97,19 @@ CSRF `state` check is per-origin and must match the redirect origin.
 ```bash
 cd backend
 pip install -r requirements.txt
+# GPU-only: torch is installed out-of-band from the CUDA index (the default
+# PyPI wheel lacks kernels for recent GPUs, e.g. RTX 50-series / Blackwell):
+pip install torch --index-url https://download.pytorch.org/whl/cu128
 uvicorn app.main:app --reload    # auto-runs Alembic migrations on startup
 ```
+
+**Music generation requires a CUDA GPU.** The service refuses to run MusicGen on
+CPU (it would be unusably slow); jobs fail loud with a clear message if no GPU is
+available. `ffmpeg` must be on PATH (used to transcode to MP3). The first
+generation downloads `facebook/musicgen-small` (~1–2 GB) and warms slowly;
+later generations reuse the warm model. Generated MP3s are written under
+`backend/media/generations/` (git-ignored) and streamed to the browser via
+`GET /generate/{job_id}/audio`.
 
 ### 3. Frontend
 

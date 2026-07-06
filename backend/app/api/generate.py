@@ -1,99 +1,138 @@
-"""Generation job endpoints.
+"""Generation job endpoints — real MusicGen inference + MP3 delivery.
 
-Phase 0: typed STUBS only, backed by an in-process dict so
-``GET /generate/{job_id}`` has something realistic to poll. Real
-generation (Celery task dispatch, MusicGen inference, MP3 storage) lands
-in Phase 3; this in-memory store will be replaced by Celery/DB-backed job
-state at that point.
+``POST /generate`` enqueues a background job (DB-backed :class:`GenerationJob`)
+and returns immediately with a ``job_id``. A background task runs MusicGen on the
+GPU, transcodes the audio to MP3 on disk, and records the result.
+``GET /generate/{job_id}`` polls status/progress; ``GET /generate/{job_id}/audio``
+streams the finished MP3 (Range-enabled, so ``<audio>`` can seek).
 """
 
+from __future__ import annotations
+
 import uuid
-from typing import Literal, TypedDict
+from pathlib import Path
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
+from app.db.session import get_db, get_session_factory
+from app.models import GenerationJob, UserSession
 from app.schemas.generate import GenerateRequest, GenerateResponse, GenerateStatusResponse
+from app.services import audio, musicgen
 
 router = APIRouter(prefix="/generate", tags=["generate"])
 
 
-class _JobState(TypedDict):
-    """Internal bookkeeping for a stub generation job."""
-
-    prompt: str
-    polls: int
-
-
-_JOBS: dict[str, _JobState] = {}
-
-_STEPS: tuple[str, ...] = ("Queued", "Sketching melody", "Rendering audio")
+def _generations_dir() -> Path:
+    """Return (creating if needed) the directory rendered MP3s are written to."""
+    directory = Path(get_settings().MEDIA_ROOT) / "generations"
+    directory.mkdir(parents=True, exist_ok=True)
+    return directory
 
 
-def _status_for_poll(job_id: str, polls: int) -> GenerateStatusResponse:
-    """Derive a deterministic, progressing status from the poll count.
+def _run_generation(job_id: str) -> None:
+    """Background worker: run MusicGen for ``job_id`` and record the result.
 
-    Simulates a job moving ``pending -> running -> complete`` over
-    successive polls so UI/QA can exercise polling logic without a real
-    worker.
-
-    Args:
-        job_id: The job's identifier.
-        polls: How many times this job has been polled (1-indexed).
-
-    Returns:
-        GenerateStatusResponse: The simulated status for this poll.
+    Uses its own DB session (the request-scoped one is gone by the time this runs
+    after the response). Records ``failed`` + ``error`` on any exception —
+    including the deliberate CUDA-missing refusal — rather than crashing.
     """
-    status: Literal["pending", "running", "complete", "failed"]
-    if polls <= 1:
-        status, progress, step, url = "pending", 0.0, _STEPS[0], None
-    elif polls == 2:
-        status, progress, step, url = "running", 0.35, _STEPS[1], None
-    elif polls == 3:
-        status, progress, step, url = "running", 0.75, _STEPS[2], None
-    else:
-        status, progress, step = "complete", 1.0, None
-        url = f"https://static.spaghettitunes.dev/generations/{job_id}.mp3"
-    return GenerateStatusResponse(
-        job_id=job_id, status=status, progress=progress, step=step, url=url, error=None
-    )
+    db: Session = get_session_factory()()
+    try:
+        job = db.get(GenerationJob, job_id)
+        if job is None:
+            return
+
+        job.status, job.step, job.progress = "running", "Warming model", 0.1
+        db.commit()
+
+        duration = get_settings().GENERATION_DURATION_S
+        job.step, job.progress = "Composing", 0.4
+        db.commit()
+        samples, sample_rate = musicgen.generate(job.prompt, duration)
+
+        job.step, job.progress = "Rendering audio", 0.85
+        db.commit()
+        out_path = _generations_dir() / f"{job_id}.mp3"
+        audio.pcm_to_mp3(samples, sample_rate, out_path)
+
+        job.audio_path = str(out_path)
+        job.status, job.step, job.progress = "complete", "Done", 1.0
+        db.commit()
+    except Exception as exc:  # noqa: BLE001 - record failure on the job, don't crash the worker
+        db.rollback()
+        job = db.get(GenerationJob, job_id)
+        if job is not None:
+            job.status, job.error = "failed", str(exc)
+            db.commit()
+    finally:
+        db.close()
 
 
 @router.post("", response_model=GenerateResponse, status_code=202)
-def create_generation_job(payload: GenerateRequest) -> GenerateResponse:
-    """Enqueue a generation job.
+def create_generation_job(
+    payload: GenerateRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)
+) -> GenerateResponse:
+    """Enqueue a generation job and schedule the background worker.
 
-    Stub: registers the job in an in-memory store rather than dispatching
-    a Celery task.
+    ``enhance_lyrics`` / ``lyrics`` / ``reference_sample_ids`` are accepted for
+    forward-compatibility but ignored this phase (prompt-only conditioning).
 
-    Args:
-        payload: Prompt, optional lyrics, and taste-conditioning options.
-
-    Returns:
-        GenerateResponse: The new job's id, with status always "pending".
+    Raises:
+        HTTPException: 404 if ``session_id`` does not match a known session.
     """
+    if db.get(UserSession, payload.session_id) is None:
+        raise HTTPException(status_code=404, detail="Unknown session_id.")
+
     job_id = f"job_{uuid.uuid4().hex[:12]}"
-    _JOBS[job_id] = {"prompt": payload.prompt, "polls": 0}
+    db.add(
+        GenerationJob(
+            job_id=job_id,
+            session_id=payload.session_id,
+            prompt=payload.prompt,
+            status="pending",
+        )
+    )
+    db.commit()
+
+    background_tasks.add_task(_run_generation, job_id)
     return GenerateResponse(job_id=job_id, status="pending")
 
 
 @router.get("/{job_id}", response_model=GenerateStatusResponse)
-def get_generation_status(job_id: str) -> GenerateStatusResponse:
-    """Poll a generation job's status.
-
-    Stub: progresses deterministically each time a given ``job_id`` is
-    polled (pending -> running -> running -> complete).
-
-    Args:
-        job_id: The job id returned by ``POST /generate``.
-
-    Returns:
-        GenerateStatusResponse: The job's current (simulated) status.
+def get_generation_status(job_id: str, db: Session = Depends(get_db)) -> GenerateStatusResponse:
+    """Poll a generation job's status/progress/result.
 
     Raises:
         HTTPException: 404 if ``job_id`` is unknown.
     """
-    job = _JOBS.get(job_id)
+    job = db.get(GenerationJob, job_id)
     if job is None:
         raise HTTPException(status_code=404, detail=f"Unknown job_id '{job_id}'.")
-    job["polls"] += 1
-    return _status_for_poll(job_id, job["polls"])
+    url = f"/generate/{job_id}/audio" if job.status == "complete" else None
+    return GenerateStatusResponse(
+        job_id=job.job_id,
+        status=job.status,
+        progress=job.progress,
+        step=job.step,
+        url=url,
+        error=job.error,
+    )
+
+
+@router.get("/{job_id}/audio")
+def get_generation_audio(job_id: str, db: Session = Depends(get_db)) -> FileResponse:
+    """Stream a completed job's rendered MP3.
+
+    Raises:
+        HTTPException: 404 if the job is unknown or its audio file is missing.
+    """
+    job = db.get(GenerationJob, job_id)
+    if job is None or not job.audio_path:
+        raise HTTPException(status_code=404, detail="No audio for this job.")
+    path = Path(job.audio_path)
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Audio file missing.")
+    return FileResponse(str(path), media_type="audio/mpeg", filename=f"{job_id}.mp3")
