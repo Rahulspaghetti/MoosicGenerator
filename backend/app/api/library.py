@@ -159,13 +159,20 @@ def _resolve_genres(
 
 
 def _collect_playlists(sp: spotipy.Spotify) -> list[Playlist]:
-    """Best-effort fetch of the user's playlists; degrades to ``[]`` on error."""
+    """Best-effort fetch of the user's **public** playlists; ``[]`` on error.
+
+    Only playlists whose ``public`` flag is truthy are kept — private and
+    collaborative playlists are skipped by design (the app requests just the
+    ``user-library-read`` scope and never reads private playlist contents).
+    """
     playlists: list[Playlist] = []
     try:
         page: dict[str, Any] | None = sp.current_user_playlists(limit=_PAGE_SIZE)
         colors = cycle(_PLAYLIST_COLORS)
         while page is not None:
             for item in page.get("items") or []:
+                if not item.get("public"):
+                    continue
                 playlists.append(
                     Playlist(
                         id=item["id"],

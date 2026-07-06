@@ -13,7 +13,13 @@ exact same database. A single shared connection (``StaticPool``,
 and the background-task threadpool.
 """
 
+import os
 from collections.abc import Generator
+
+# Provide a deterministic Fernet key for the token-encryption layer BEFORE any
+# app module (and its cached Settings) is imported. Real keys live in .env; this
+# fixed test key only ever encrypts throwaway in-memory SQLite rows.
+os.environ["TOKEN_ENCRYPTION_KEY"] = "gjgpxZr9er1g3w9S08aLeZG_w9GluOzQD0IQ9v-Q1fw="
 
 import pytest
 from fastapi.testclient import TestClient

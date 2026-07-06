@@ -43,6 +43,11 @@ class Settings(BaseSettings):
 
     SPOTIFY_CLIENT_ID: str = ""
     SPOTIFY_CLIENT_SECRET: str = ""
+    # Fernet key used to encrypt OAuth tokens at rest (see app.core.crypto).
+    # Generate with: python -c "from cryptography.fernet import Fernet;
+    # print(Fernet.generate_key().decode())". Empty by default so the app fails
+    # loud (never silently stores plaintext tokens) if it is not configured.
+    TOKEN_ENCRYPTION_KEY: str = ""
     # The browser is redirected here by Spotify after consent. This is the
     # FRONTEND's /callback route (Angular), which reads code/state and calls
     # the backend's GET /auth/callback via XHR. Spotify requires 127.0.0.1

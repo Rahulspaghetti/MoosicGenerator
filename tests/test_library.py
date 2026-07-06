@@ -20,6 +20,7 @@ from app.models import ArtistGenreCache, TasteProfile, UserSession
 TRACKS_URL = "https://api.spotify.com/v1/me/tracks"
 TRACKS_NEXT_URL = "https://api.spotify.com/v1/me/tracks?offset=50&limit=50"
 ARTIST_URL = "https://api.spotify.com/v1/artists/{artist_id}"
+PLAYLISTS_URL = "https://api.spotify.com/v1/me/playlists"
 
 SESSION_ID = "sess_test_1"
 SPOTIFY_USER = "spotify-user-1"
@@ -210,6 +211,29 @@ def test_persistent_429_skips_artist_but_completes(client: TestClient, db_sessio
 
     assert job["status"] == "complete"
     assert job["result"]["genres"] == []
+
+
+@responses.activate
+def test_sync_keeps_only_public_playlists(client: TestClient, db_session) -> None:
+    _seed_session(db_session)
+    responses.add(responses.GET, TRACKS_URL, json=_page([], total=0), status=200)
+    responses.add(
+        responses.GET,
+        PLAYLISTS_URL,
+        json=_page(
+            [
+                {"id": "pub1", "name": "Public Mix", "public": True, "tracks": {"total": 12}},
+                {"id": "priv1", "name": "Secret", "public": False, "tracks": {"total": 3}},
+                {"id": "collab1", "name": "Collab", "public": None, "tracks": {"total": 7}},
+            ],
+            total=3,
+        ),
+        status=200,
+    )
+
+    job = _run_sync(client)
+    names = [p["name"] for p in job["result"]["playlists"]]
+    assert names == ["Public Mix"]
 
 
 @responses.activate
